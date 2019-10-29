@@ -95,6 +95,23 @@ server.get("/api/posts/:id", (req, res) => {
     });
 });
 
+server.delete("/api/posts/:id", (req, res) => {
+  const id = req.params.id;
+  database.findById(id).then(post => {
+    if (post.length) {
+      database.remove(id).then(data => {
+        console.log(data);
+        if (data) {
+          res.status(201).json({ message: "Deleted", data: post[0] });
+        } else res.status(500).json({ error: "The post could not be removed" });
+      });
+    } else
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+  });
+});
+
 server.listen(4001, () => {
   console.log("\n*** Server Running on http://localhost:4001 ***\n");
 });
