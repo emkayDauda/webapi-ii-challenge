@@ -112,6 +112,42 @@ server.delete("/api/posts/:id", (req, res) => {
   });
 });
 
+server.put("/api/posts/:id", (req, res) => {
+  const { id } = req.params;
+  const { title, contents } = req.body;
+
+  database.findById(id).then(post => {
+    if (post.length) {
+      if (title && contents) {
+        database
+          .update(id, { title, contents })
+          .then(data => {
+              if (data == '1') {
+                res
+                .status(201)
+                .json({ message: "updated", data: { id, title, contents } })
+              }
+
+              else res.status(403).json({message: 'Failed to update'})
+          }  
+          )
+          .catch(() => {
+            res
+              .status(500)
+              .json({ error: "The post information could not be modified." });
+          });
+      } else {
+        res.status(400).json({
+          errorMessage: "Please provide title and contents for the post."
+        });
+      }
+    } else
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+  });
+});
+
 server.listen(4001, () => {
   console.log("\n*** Server Running on http://localhost:4001 ***\n");
 });
