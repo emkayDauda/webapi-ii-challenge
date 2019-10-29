@@ -56,14 +56,13 @@ server.post("/api/posts/:postId/comments", (req, res) => {
       .findById(postId)
       .then(post => {
         if (post.length) {
-            console.log(post.length)
+          console.log(post.length);
           database
             .insertComment(newBody)
             .then(() => res.status(200).json(newBody))
             .catch(() => {
               res.status(500).json({
-                error:
-                  "There was an error saving to the database"
+                error: "There was an error saving to the database"
               });
             });
         } else res.status(404).json({ message: "Post with that id not found" });
@@ -74,6 +73,26 @@ server.post("/api/posts/:postId/comments", (req, res) => {
         });
       });
   }
+});
+
+server.get("/api/posts/:id", (req, res) => {
+  const { id } = req.params;
+  database
+    .findById(id)
+    .then(post => {
+      if (post.length) {
+        console.log(post.length);
+        res.status(201).json(post);
+      } else
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+    })
+    .catch(() => {
+      res
+        .status(500)
+        .json({ error: "The post information could not be retrieved." });
+    });
 });
 
 server.listen(4001, () => {
