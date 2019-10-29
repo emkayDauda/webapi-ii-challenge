@@ -46,6 +46,36 @@ server.post("/api/posts", (req, res) => {
   }
 });
 
+server.post("/api/posts/:postId/comments", (req, res) => {
+  const { postId } = req.params;
+  const { text } = req.body;
+
+  if (text && postId) {
+    const newBody = { text, post_id: postId };
+    database
+      .findById(postId)
+      .then(post => {
+        if (post.length) {
+            console.log(post.length)
+          database
+            .insertComment(newBody)
+            .then(() => res.status(200).json(newBody))
+            .catch(() => {
+              res.status(500).json({
+                error:
+                  "There was an error saving to the database"
+              });
+            });
+        } else res.status(404).json({ message: "Post with that id not found" });
+      })
+      .catch(() => {
+        res.status(500).json({
+          error: "There was an error while saving the comment to the database"
+        });
+      });
+  }
+});
+
 server.listen(4001, () => {
   console.log("\n*** Server Running on http://localhost:4001 ***\n");
 });
